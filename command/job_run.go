@@ -121,7 +121,10 @@ Run Options:
     Nomad servers.
 
   -var 'key=value'
-    Variable for template, can be used multiple times.
+    Variable for HCL2, can be used multiple times. Use -var-file if you are
+    submitting variables of type list or object. Nomad will attempt to decode
+    quoted lists or objects but these cannot be handled correctly in the web UI
+    unless passed via -var-file.
 
   -var-file=path
     Path to HCL2 file containing user variables.

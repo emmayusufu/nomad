@@ -13,11 +13,13 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/cli"
 	gg "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/nomad/api"
@@ -471,6 +473,9 @@ func (j *JobGetter) ApiJob(jpath string) (*api.JobSubmission, *api.Job, error) {
 }
 
 func (j *JobGetter) Get(jpath string) (*api.JobSubmission, *api.Job, error) {
+
+	spew.Dump(j.Vars)
+
 	var jobfile io.Reader
 	pathName := filepath.Base(jpath)
 	switch jpath {
@@ -596,12 +601,22 @@ func (j *JobGetter) Get(jpath string) (*api.JobSubmission, *api.Job, error) {
 		// take precedence.
 		maps.Copy(extractedEnvVars, extractedVarFlags)
 
+		// To avoid later parsing ambiguities in the web UI or other callers
+		// that can't parse HCL2, we'll flatten the -var flags into a fake
+		// "variables file" and append this to the file we already have.
+		if len(extractedEnvVars) > 0 {
+			varFileCat += "\n"
+		}
+		for _, k := range slices.Sorted(maps.Keys(extractedEnvVars)) {
+			v := extractedEnvVars[k]
+			varFileCat += fmt.Sprintf("%s = %q\n", k, v)
+		}
+
 		// submit the job with the submission with content from -var flags
 		jobSubmission = &api.JobSubmission{
-			VariableFlags: extractedEnvVars,
-			Variables:     varFileCat,
-			Source:        source.String(),
-			Format:        formatHCL2,
+			Variables: varFileCat,
+			Source:    source.String(),
+			Format:    formatHCL2,
 		}
 	}
 

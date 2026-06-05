@@ -4329,12 +4329,14 @@ type JobSubmission struct {
 	// hcl1 format has been removed and can no longer be parsed.
 	Format string
 
-	// VariableFlags contain the CLI "-var" flag arguments as submitted with the
-	// job (hcl2 only).
+	// Deprecated: VariableFlags contain a map of HCL2 variables to their string
+	// values submitted with the job. This creates parsing ambiguity for
+	// non-string variables. We should remove this in a future version of the
+	// API.
 	VariableFlags map[string]string
 
 	// Variables contains the opaque variable blob that was input from the
-	// webUI (hcl2 only).
+	// CLI's -var/-var-file parameters or the web UI (HCL2 only)
 	Variables string
 
 	// Namespace is managed internally, do not set.
