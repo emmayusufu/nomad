@@ -13,7 +13,7 @@ import (
 type Queue interface {
 	Enqueue(*structs.Evaluation)
 	Start(context.Context) error
-	Status() structs.QueueStatusResponse
+	Status(structs.QueueStatusRequest) structs.QueueStatusResponse
 	SetEnabled(bool, *state.StateStore)
 }
 

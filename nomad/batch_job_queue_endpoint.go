@@ -27,14 +27,14 @@ func (q *BatchJobQueue) Status(args *structs.QueueStatusRequest, reply *structs.
 	if done, err := q.srv.forward("BatchJobQueue.Status", args, args, reply); done {
 		return err
 	}
-	q.srv.MeasureRPCRate("queue", structs.RateMetricList, args)
+	q.srv.MeasureRPCRate("queue.status", structs.RateMetricList, args)
 	if authErr != nil {
 		return structs.ErrPermissionDenied
 	}
 
-	status := q.srv.batchJobQueue.Status()
+	status := q.srv.batchJobQueue.Status(*args)
 
 	reply.Type = status.Type
-	reply.Workloads = status.Workloads
+	reply.Results = status.Results
 	return nil
 }

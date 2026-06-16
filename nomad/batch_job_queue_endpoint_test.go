@@ -29,5 +29,5 @@ func TestBatchJobQueue_Status(t *testing.T) {
 	err := s.RPC("BatchJobQueue.Status", &req, &reply)
 	must.NoError(t, err)
 	must.Eq(t, reply.Type, "unset")
-	must.Nil(t, reply.Workloads)
+	must.Nil(t, reply.Results)
 }
